@@ -50,12 +50,14 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project)
+    public function show($id)
     {
-        $project->load('type');  
+        $project = Project::findOrFail($id);
+        $technologies = $project->technologies;
 
-        return view('admin.projects.show', compact('project'));
+        return view('projects.show', compact('project', 'technologies'));
     }
+    
 
     /**
      * Show the form for editing the specified resource.

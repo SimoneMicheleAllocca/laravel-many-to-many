@@ -7,12 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
+    protected $fillable = ['title', 'description'];
 
-    protected $fillable = ['name', 'description', 'type_id'];
-
-    public function type()
+    public function technologies()
     {
-        return $this->belongsTo(Type::class);
+        return $this->belongsToMany(Technology::class);
     }
 }
