@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\Technology;
 use Illuminate\Http\Request;
 use App\Models\Type;
 use Illuminate\Support\Str;
@@ -25,7 +26,8 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::all();
-        return view('admin.projects.create', compact('types'));
+        $technologies = Technology::all();
+        return view('admin.projects.create', compact('types', 'technologies'));
     }
 
     /**
@@ -37,12 +39,18 @@ class ProjectController extends Controller
             'title' => 'required',
             'description' => 'required',
             'type_id' => 'nullable|exists:types,id',
+            'technologies' => 'array',
+            'technologies.*' => 'exists:technologies,id',
         ]);
 
         $project = new Project();
         $project->slug = Str::slug($request->title);
         $project->fill($validated);
         $project->save();
+
+        if ($request->has('technologies')) {
+            $project->technologies()->sync($request->technologies);
+        }
 
         return redirect()->route('admin.projects.index');
     }
@@ -55,9 +63,8 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $technologies = $project->technologies;
 
-        return view('projects.show', compact('project', 'technologies'));
+        return view('admin.projects.show', compact('project', 'technologies'));
     }
-    
 
     /**
      * Show the form for editing the specified resource.
@@ -65,7 +72,8 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $types = Type::all();
-        return view('admin.projects.edit', compact('project', 'types'));
+        $technologies = Technology::all();
+        return view('admin.projects.edit', compact('project', 'types', 'technologies'));
     }
 
     /**
@@ -77,10 +85,16 @@ class ProjectController extends Controller
             'title' => 'required',
             'description' => 'required',
             'type_id' => 'nullable|exists:types,id',
+            'technologies' => 'array',
+            'technologies.*' => 'exists:technologies,id',
         ]);
 
         $project->slug = Str::slug($request->title);
         $project->update($validated);
+
+        if ($request->has('technologies')) {
+            $project->technologies()->sync($request->technologies);
+        }
 
         return redirect()->route('admin.projects.index');
     }
@@ -92,6 +106,6 @@ class ProjectController extends Controller
     {
         $project->delete();
 
-        return redirect()->route('projects.index');
+        return redirect()->route('admin.projects.index');
     }
 }

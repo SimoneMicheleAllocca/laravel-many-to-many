@@ -15,7 +15,7 @@
 
         <div class="mb-3">
             <label for="description" class="form-label">Descrizione</label>
-            <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $project->description) }}</textarea>
+            <textarea class="form-control" id="description" name="description" rows="3" required>{{ old('description', $project->description) }}</textarea>
         </div>
 
         <div class="mb-3">
@@ -28,6 +28,19 @@
                     </option>
                 @endforeach
             </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tecnologie</label>
+            @foreach($technologies as $technology)
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="technology{{ $technology->id }}" name="technologies[]" value="{{ $technology->id }}" 
+                    {{ in_array($technology->id, old('technologies', $project->technologies->pluck('id')->toArray())) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="technology{{ $technology->id }}">
+                        {{ $technology->name }}
+                    </label>
+                </div>
+            @endforeach
         </div>
 
         <button type="submit" class="btn btn-primary">Salva Modifiche</button>
